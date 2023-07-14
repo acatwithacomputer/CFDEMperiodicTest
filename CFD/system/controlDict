@@ -43,7 +43,7 @@ timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable off;//yes;
+runTimeModifiable off;
 
 adjustTimeStep  no;
 
@@ -51,34 +51,5 @@ maxCo           1;
 
 maxDeltaT       1;
 
-
-// ************************************************************************* //
-
-
-functions
-{
-    probes
-    {
-        type        probes;
-        // Where to load it from
-        functionObjectLibs ( "libsampling.so" );
-        // Name of the directory for probe data
-        name        probes;
-        probeLocations
-        (
-            (0.2001 0.2001 0.0001)
-        //    (0.5001 0.5001 1.0001)
-        //    (0.5001 0.5001 2.0001)
-        //    (0.5001 0.5001 3.0001)
-        );
-
-        // Fields to be probed
-        fields ( p );
-
-        // Write at same frequency as fields
-        outputControl   timeStep;//outputTime;
-        outputInterval  1;
-    }
-}
 
 // ************************************************************************* //
