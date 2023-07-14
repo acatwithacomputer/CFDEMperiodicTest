@@ -1,0 +1,88 @@
+echo            both
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+include         ../DEM/in.DEM
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f p
+newton          off
+
+units           si
+processors      ${xProc} ${yProc} ${zProc}
+
+# read the restart file
+
+
+region          reg block 0. ${Lx} 0. ${Ly} 0. ${Lz} units box
+create_box      1 reg
+
+neighbor        0.3 bin
+neigh_modify    delay 0 binsize 0.01
+
+
+# Material properties required for new pair styles
+
+fix             m1 all property/global youngsModulus peratomtype 5.e7
+fix             m2 all property/global poissonsRatio peratomtype 0.45
+fix             m3 all property/global coefficientRestitution peratomtypepair 1 0.9
+fix             m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style      gran model hertz tangential history #Hertzian without cohesion
+pair_coeff      * *
+
+# timestep, gravity
+timestep        ${timeStep}
+
+fix             gravi all gravity $g vector 0.0 0.0 -1.0
+
+# walls
+fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane ${Lx}
+fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane ${Ly}
+#fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.
+#fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane ${Lz}
+
+# cfd coupling
+fix     cfd  all couple/cfd couple_every ${tSint} mpi
+fix     cfd2 all couple/cfd/force
+
+# create single partciles
+# we just read the restart now
+create_atoms 1 single .51 .51 .34 units box
+set atom 1 diameter $R density ${rhos} vx 0 vy 0 vz 0
+
+variable        vx1 equal vx[1]
+variable        vy1 equal vy[1]
+variable        vz1 equal vz[1]
+variable        x1 equal x[1]
+variable        y1 equal y[1]
+variable        z1 equal z[1]
+variable        time equal step*dt
+
+fix             extra1 all print 100 "${time} ${vx1} ${vy1} ${vz1}" file ../DEM/post/velocity_particle_1.txt title "%" screen no
+fix             extra3 all print 100 "${time} ${x1}  ${y1}  ${z1}"  file ../DEM/post/position_particle_1.txt title "%" screen no
+
+# apply nve integration to all particles that are inserted as single particles
+fix             integr all nve/sphere #wenn das ausgeblendet, dann kein vel update
+
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+# insert the first particles so that dump is not empty
+dump            dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+
+#force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
+#node : f_couple_cfd[6]
+#cell id : f_couple_cfd[7]
+
+run             1

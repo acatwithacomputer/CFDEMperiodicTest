@@ -1,0 +1,22 @@
+# Particle and Domain Properties for DEM
+ 
+#--------------------------Domain Properties--------------------------#
+ 
+variable Lx equal 1.0
+variable Ly equal 1.0
+variable Lz equal 1.0
+ 
+#-------------------------Particle Properties-------------------------#
+ 
+variable R        equal .5    # diameter of particle
+variable rhos     equal 1.5   # density of particles 
+variable g        equal 981   # gravity 
+ 
+#-------------------------Simulation Settings-------------------------#
+ 
+variable xProc     equal   2      # processor sections in x direction
+variable yProc     equal   2      # processor sections in y direction
+variable zProc     equal   1      # processor sections in z direction
+ 
+variable timeStep  equal  0.00003 #[s]		simulation timestep DEM
+variable tSint     equal   10     # couple every tSint timesteps
