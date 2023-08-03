@@ -28,17 +28,19 @@ FoamFile
 
 modelType none;
 
+checkPeriodicCells true;
+
 couplingInterval 10;
 
 depth 0;
 
-voidFractionModel IB;//bigParticle;//centre; //
+voidFractionModel IB;
 
-locateModel engineIB;//standard;//
+locateModel engineIB;
 
 meshMotionModel noMeshMotion;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;
+dataExchangeModel twoWayMPI;
 
 IOModel basicIO;
 
@@ -60,7 +62,6 @@ momCoupleModels
 (
 );
 
-//turbulenceModelType RASProperties;//LESProperties; //OFversion24x
 turbulenceModelType turbulenceProperties; //OFversion30x
 
 //===========================================================================//
@@ -78,12 +79,6 @@ ArchimedesIBProps
     voidfractionFieldName "voidfractionNext";
 }
 
-twoWayFilesProps
-{
-    maxNumberOfParticles 10000;
-    DEMts 0.00003;
-}
-
 twoWayMPIProps
 {
     maxNumberOfParticles 10100;
@@ -97,29 +92,11 @@ IBProps
     scaleUpVol 1.0;
 }
 
-bigParticleProps
-{
-    maxCellsPerParticle 100000;
-    alphaMin 0.30;
-    scaleUpVol 1.0;
-}
-centreProps
-{
-    alphaMin 0.30;
-}
-
-dividedProps
-{
-    alphaMin 0.05;
-    scaleUpVol 1.2;
-}
-
 engineIBProps
 {
     treeSearch false;
     zSplit 8;
     xySplit 16;
-    checkPeriodicCells true;
 }
 
 // ************************************************************************* //
